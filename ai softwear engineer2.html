@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Software Engineer Assistant</title>
+    <style>
+        /* CSS Styles */
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3f7;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            height: 100%;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+        }
+        
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .mode-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .mode-btn:hover {
+            background-color: #dee2e6;
+        }
+        
+        .mode-btn.active:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .error {
+            color: var(--danger-color);
+            border-left-color: var(--danger-color);
+        }
+        
+        .success {
+            color: var(--success-color);
+            border-left-color: var(--success-color);
+        }
+        
+        .warning {
+            color: var(--warning-color);
+            border-left-color: var(--warning-color);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .language-selector {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>AI Software Engineer Assistant</h1>
+            <p class="subtitle">Get code, debug, and analyze your code in multiple languages</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="app-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Code Input</h2>
+                </div>
+                
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="get-code">Get Code</button>
+                    <button class="mode-btn" data-mode="debug-code">Debug Code</button>
+                    <button class="mode-btn" data-mode="analyze-code">Analyze Code</button>
+                </div>
+                
+                <select id="language-selector" class="language-selector">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="csharp">C#</option>
+                    <option value="php">PHP</option>
+                    <option value="cpp">C++</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="go">Go</option>
+                    <option value="swift">Swift</option>
+                    <option value="typescript">TypeScript</option>
+                </select>
+                
+                <textarea id="code-input" placeholder="Describe what code you need or paste your code here for debugging/analysis..."></textarea>
+                
+                <div class="action-buttons">
+                    <button id="submit-btn" class="btn">Submit</button>
+                    <button id="clear-btn" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Results</h2>
+                </div>
+                
+                <div id="result-container" class="result-container" style="display: none;">
+                    <div class="result-title" id="result-title">Result</div>
+                    <pre id="result-content"></pre>
+                </div>
+                
+                <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
+                    <div class="loading"></div>
+                    <p>Processing your request...</p>
+                </div>
+                
+                <div id="error-container" class="result-container error" style="display: none;">
+                    <div class="result-title">Error</div>
+                    <pre id="error-content"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            const codeInput = document.getElementById('code-input');
+            const languageSelector = document.getElementById('language-selector');
+            const submitBtn = document.getElementById('submit-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const resultContainer = document.getElementById('result-container');
+            const resultTitle = document.getElementById('result-title');
+            const resultContent = document.getElementById('result-content');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const errorContainer = document.getElementById('error-container');
+            const errorContent = document.getElementById('error-content');
+            
+            // Current mode (get-code, debug-code, analyze-code)
+            let currentMode = 'get-code';
+            
+            // Set up mode buttons
+            modeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    modeButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Update current mode
+                    currentMode = this.dataset.mode;
+                    
+                    // Update placeholder text based on mode
+                    updatePlaceholder();
+                });
+            });
+            
+            // Update placeholder text based on mode
+            function updatePlaceholder() {
+                if (currentMode === 'get-code') {
+                    codeInput.placeholder = 'Describe what code you need (e.g., "How to sort an array in JavaScript")';
+                } else if (currentMode === 'debug-code') {
+                    codeInput.placeholder = 'Paste your code here to debug it...';
+                } else if (currentMode === 'analyze-code') {
+                    codeInput.placeholder = 'Paste your code here to analyze it for bugs and issues...';
+                }
+            }
+            
+            // Clear button functionality
+            clearBtn.addEventListener('click', function() {
+                codeInput.value = '';
+                resultContainer.style.display = 'none';
+                errorContainer.style.display = 'none';
+            });
+            
+            // Submit button functionality
+            submitBtn.addEventListener('click', function() {
+                const inputText = codeInput.value.trim();
+                const language = languageSelector.value;
+                
+                if (!inputText) {
+                    showError('Please enter some code or a description');
+                    return;
+                }
+                
+                // Show loading indicator
+                loadingIndicator.style.display = 'block';
+                resultContainer.style.display = 'none';
+                errorContainer.style.display = 'none';
+                
+                // Simulate AI processing (in a real app, this would be an API call)
+                setTimeout(() => {
+                    processRequest(inputText, language);
+                    loadingIndicator.style.display = 'none';
+                }, 1500);
+            });
+            
+            // Process the request based on mode
+            function processRequest(inputText, language) {
+                try {
+                    let result;
+                    
+                    if (currentMode === 'get-code') {
+                        result = generateCode(inputText, language);
+                        resultTitle.textContent = 'Generated Code';
+                        resultContainer.className = 'result-container success';
+                    } else if (currentMode === 'debug-code') {
+                        result = debugCode(inputText, language);
+                        resultTitle.textContent = 'Debugging Results';
+                        resultContainer.className = 'result-container warning';
+                    } else if (currentMode === 'analyze-code') {
+                        result = analyzeCode(inputText, language);
+                        resultTitle.textContent = 'Code Analysis';
+                        resultContainer.className = 'result-container';
+                    }
+                    
+                    resultContent.textContent = result;
+                    resultContainer.style.display = 'block';
+                } catch (error) {
+                    showError(error.message);
+                }
+            }
+            
+            // Show error message
+            function showError(message) {
+                errorContent.textContent = message;
+                errorContainer.style.display = 'block';
+                resultContainer.style.display = 'none';
+                loadingIndicator.style.display = 'none';
+            }
+            
+            // Simulated AI functions (in a real app, these would call an AI API)
+            
+            function generateCode(description, language) {
+                // This is a simulation - a real app would call an AI API
+                const examples = {
+                    'javascript': `// ${description}
+function example() {
+    // Sample implementation
+    const arr = [5, 3, 8, 1];
+    const sorted = arr.sort((a, b) => a - b);
+    console.log(sorted);
+    return sorted;
+}`,
+                    'python': `# ${description}
+def example():
+    # Sample implementation
+    arr = [5, 3, 8, 1]
+    sorted_arr = sorted(arr)
+    print(sorted_arr)
+    return sorted_arr`,
+                    'java': `// ${description}
+public class Example {
+    public static void main(String[] args) {
+        // Sample implementation
+        int[] arr = {5, 3, 8, 1};
+        Arrays.sort(arr);
+        System.out.println(Arrays.toString(arr));
+    }
+}`,
+                    'cpp': `// ${description}
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+void example() {
+    // Sample implementation
+    std::vector<int> arr = {5, 3, 8, 1};
+    std::sort(arr.begin(), arr.end());
+    for (int num : arr) {
+        std::cout << num << " ";
+    }
+}`
+                };
+                
+                return examples[language] || `// Code generation for ${language}\n// ${description}\n// Implementation would go here`;
+            }
+            
+            function debugCode(code, language) {
+                // This is a simulation - a real app would call an AI API
+                const commonIssues = {
+                    'javascript': [
+                        "Potential issue: Missing semicolons can cause unexpected behavior in some cases.",
+                        "Check for undefined variables - make sure all variables are properly declared.",
+                        "Consider adding error handling with try-catch blocks."
+                    ],
+                    'python': [
+                        "Potential issue: Indentation errors are common in Python - check your whitespace.",
+                        "Watch out for mutable default arguments which can cause unexpected behavior.",
+                        "Consider adding type hints for better code maintainability."
+                    ],
+                    'java': [
+                        "Potential issue: Check for proper exception handling.",
+                        "Make sure all variables are properly initialized before use.",
+                        "Consider adding null checks to prevent NullPointerException."
+                    ]
+                };
+                
+                const issues = commonIssues[language] || [
+                    "Potential syntax errors - review your code structure.",
+                    "Check for proper variable declarations and scoping.",
+                    "Consider edge cases in your logic."
+                ];
+                
+                // Simulate finding some issues
+                const foundIssues = [];
+                const lines = code.split('\n');
+                
+                // Check for common patterns
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    
+                    if (line.includes('for(') && !line.includes('{') && language === 'javascript') {
+                        foundIssues.push(`Line ${i+1}: For loop without braces can lead to errors - consider adding {}`);
+                    }
+                    
+                    if (line.includes('==') && !line.includes('===') && language === 'javascript') {
+                        foundIssues.push(`Line ${i+1}: Using == can cause type coercion issues - consider using === for strict equality`);
+                    }
+                    
+                    if (line.includes('print(') && language === 'python' && !line.trim().startsWith('#')) {
+                        foundIssues.push(`Line ${i+1}: Consider using logging instead of print for production code`);
+                    }
+                }
+                
+                // Add some general issues
+                foundIssues.push(...issues.slice(0, 3));
+                
+                if (foundIssues.length === 0) {
+                    return "No obvious issues found. Your code looks clean!\n\nSuggestions:\n- Add comments for complex logic\n- Consider edge cases\n- Write unit tests";
+                }
+                
+                return `Found ${foundIssues.length} potential issues:\n\n${foundIssues.map(issue => `• ${issue}`).join('\n')}\n\nSuggestions:\n- Review the highlighted issues\n- Test with different inputs\n- Consider adding error handling`;
+            }
+            
+            function analyzeCode(code, language) {
+                // This is a simulation - a real app would call an AI API
+                const analysis = {
+                    complexity: Math.floor(Math.random() * 5) + 1,
+                    readability: Math.floor(Math.random() * 5) + 1,
+                    maintainability: Math.floor(Math.random() * 5) + 1,
+                    potentialBugs: Math.floor(Math.random() * 3),
+                    performanceTips: []
+                };
+                
+                // Add some language-specific tips
+                if (language === 'javascript') {
+                    analysis.performanceTips.push(
+                        "Consider using 'for-of' loops instead of 'for-in' for arrays",
+                        "Use 'const' and 'let' instead of 'var' for better scoping",
+                        "Memoize expensive function calls"
+                    );
+                } else if (language === 'python') {
+                    analysis.performanceTips.push(
+                        "Use list comprehensions for better performance",
+                        "Consider using generators for large datasets",
+                        "Use 'join()' for string concatenation in loops"
+                    );
+                } else if (language === 'java') {
+                    analysis.performanceTips.push(
+                        "Use StringBuilder for string concatenation in loops",
+                        "Consider using primitive types instead of wrappers when possible",
+                        "Reuse objects where possible to reduce GC pressure"
+                    );
+                }
+                
+                // Generate analysis report
+                let report = `Code Analysis Report (${language.toUpperCase()})\n\n`;
+                report += `Code Complexity: ${'★'.repeat(analysis.complexity)} (${analysis.complexity}/5)\n`;
+                report += `Readability: ${'★'.repeat(analysis.readability)} (${analysis.readability}/5)\n`;
+                report += `Maintainability: ${'★'.repeat(analysis.maintainability)} (${analysis.maintainability}/5)\n\n`;
+                report += `Potential Bugs Found: ${analysis.potentialBugs}\n\n`;
+                
+                if (analysis.performanceTips.length > 0) {
+                    report += `Performance Tips:\n${analysis.performanceTips.map(tip => `• ${tip}`).join('\n')}\n\n`;
+                }
+                
+                report += `Overall Suggestions:\n`;
+                report += `• Add comments for complex sections\n`;
+                report += `• Consider edge cases in your logic\n`;
+                report += `• Write unit tests to verify functionality\n`;
+                report += `• Refactor long functions into smaller, focused ones`;
+                
+                return report;
+            }
+            
+            // Initialize
+            updatePlaceholder();
+        });
+    </script>
+</body>
+</html>
